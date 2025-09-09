@@ -1,1 +1,61 @@
-C:\Users\gabri\Desktop\FIAP\Fase 3\Tech_Challenge\Data
+# ==============================
+# IGNORAR A PASTA DATA
+# ==============================
+Fase 3/Tech_Challenge/Data/
+
+# ==============================
+# AMBIENTES VIRTUAIS
+# ==============================
+venv/
+.venv/
+env/
+ENV/
+
+# ==============================
+# JUPYTER NOTEBOOKS
+# ==============================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ==============================
+# PYTHON CACHE
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ==============================
+# LOGS
+# ==============================
+*.log
+
+# ==============================
+# CONFIGURAÇÕES DE IDEs
+# ==============================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ==============================
+# ARQUIVOS DE SISTEMA
+# ==============================
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ==============================
+# ARQUIVOS TEMPORÁRIOS E BACKUPS
+# ==============================
+*.bak
+*.tmp
+*.swp
+
+# ==============================
+# CSVs, JSONs, EXCELS E PDFs GERADOS
+# ==============================
+*.csv
+*.json
+*.xlsx
+*.xls
+*.pdf
