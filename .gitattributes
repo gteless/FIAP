@@ -1,0 +1,2 @@
+Fase[[:space:]]3/Tech_Challenge/Data/*.csv filter=lfs diff=lfs merge=lfs -text
+Fase[[:space:]]3/Tech_Challenge/Data/*.xls filter=lfs diff=lfs merge=lfs -text
