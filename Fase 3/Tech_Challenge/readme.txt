@@ -1,0 +1,3 @@
+Prezado(s) avaliador(es), estimo que esteja(m) bem. 
+
+O nosso trabalho está zipado e peço que considere o arquivo Tech_Challenge_3.pdf, onde terá todo o storytelling, porém, estamos enviando também os nossos notebooks, sendo 3, o subirBase.ipynb (arquivo onde está sendo processado os microdados, armazenagem nos buckets, uso de banco de dados e disponibilização do arquivo final onde foi usado para gerar os gráfico) e os dois arquivos com o nome de gráficos, onde o nosso grupo utilizou para gerar os gráficos que foram utilizados. 
