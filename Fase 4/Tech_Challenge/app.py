@@ -4,8 +4,11 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 sns.set_theme(style="whitegrid", palette="pastel")
@@ -179,143 +182,6 @@ aplica_tema_streamlit()
 
 # Título Principal
 st.title("🏥 Ferramenta de Auxílio ao Diagnóstico de Obesidade")
-st.markdown("---") 
-
-
-############ PAINEL ANALITICO ##############
-
-# =========================
-# PAINEL ANALÍTICO
-# =========================
-if df_painel is not None:
-    # Seção 1 - Perfil da Amostra
-    st.header("📊 Perfil da Amostra")
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("Número total de participantes", len(df_painel))
-        if 'idade' in df_painel.columns:
-            st.metric("Idade média", f"{df_painel['idade'].mean():.1f} anos")
-
-    with col2:
-        if 'genero' in df_painel.columns:
-            df_plot = df_painel.copy()
-            df_plot['genero_label'] = df_plot['genero'].map({0: 'Homem', 1: 'Mulher'}).fillna('Desconhecido')
-            genero_count = df_plot['genero_label'].value_counts()
-            
-            fig, ax = plt.subplots(figsize=(4.5, 4.5))  # proporção quadrada
-            ax.pie(
-                genero_count, 
-                labels=genero_count.index, 
-                autopct='%1.1f%%', 
-                startangle=90
-            )
-            ax.set_title("Distribuição por Gênero")
-            ax.axis('equal')  # mantém o gráfico circular
-            st.pyplot(fig, use_container_width=True)  # ocupa toda a largura da coluna
-
-    with col3:
-        if 'imc' in df_painel.columns:
-            fig, ax = plt.subplots(figsize=(4.5, 4.5))  # mesmo tamanho do de cima
-            sns.histplot(df_painel['imc'].dropna(), bins=15, kde=True, ax=ax)
-            ax.set_title("Distribuição do IMC")
-            st.pyplot(fig, use_container_width=True)
-
-
-    st.markdown("---")
-
-    # Seção 2 - Hábitos Alimentares e Estilo de Vida
-    st.header("🥗 Hábitos Alimentares e Estilo de Vida")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if 'come_alimentos_caloricos_label' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='come_alimentos_caloricos_label', order=['Não', 'Sim'], ax=ax)
-            ax.set_title("Consumo de alimentos calóricos")
-            ax.set_xlabel("")
-            st.pyplot(fig)
-        elif 'come_alimentos_caloricos' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='come_alimentos_caloricos', ax=ax)
-            ax.set_title("Consumo de alimentos calóricos")
-            st.pyplot(fig)
-
-    with col2:
-        if 'consome_alcool_label' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='consome_alcool_label', order=['Não', 'Algumas vezes', 'Frequentemente', 'Sempre'], ax=ax)
-            ax.set_title("Consumo de álcool")
-            ax.set_xlabel("")
-            st.pyplot(fig)
-        elif 'consome_alcool' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='consome_alcool', ax=ax)
-            ax.set_title("Consumo de álcool")
-            st.pyplot(fig)
-
-    col3, col4 = st.columns(2)
-    with col3:
-        if 'fuma_label' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='fuma_label', order=['Não', 'Sim'], ax=ax)
-            ax.set_title("Fumantes na amostra")
-            ax.set_xlabel("")
-            st.pyplot(fig)
-        elif 'fuma' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='fuma', ax=ax)
-            ax.set_title("Fumantes na amostra")
-            st.pyplot(fig)
-
-    with col4:
-        if 'monitora_calorias_consumidas_label' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='monitora_calorias_consumidas_label', order=['Não', 'Sim'], ax=ax)
-            ax.set_title("Monitora calorias?")
-            ax.set_xlabel("")
-            st.pyplot(fig)
-        elif 'monitora_calorias_consumidas' in df_painel.columns:
-            fig, ax = plt.subplots()
-            sns.countplot(data=df_painel, x='monitora_calorias_consumidas', ax=ax)
-            ax.set_title("Monitora calorias?")
-            st.pyplot(fig)
-
-    st.markdown("---")
-
-    # Seção 3 - Desempenho do Modelo
-    st.header("🤖 Desempenho do Modelo")
-
-    if pipeline_modelo is not None and 'nivel_obesidade' in df_painel.columns:
-        # Protege caso o pipeline exija colunas específicas: remove apenas a coluna target
-        try:
-            X = df_painel.drop(columns=['nivel_obesidade'])
-            y = df_painel['nivel_obesidade']
-            y_pred = pipeline_modelo.predict(X)
-
-            acc = accuracy_score(y, y_pred)
-            st.metric("Acurácia do Modelo", f"{acc*100:.2f}%")
-
-            cm = confusion_matrix(y, y_pred)
-            fig, ax = plt.subplots()
-            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
-            ax.set_title("Matriz de Confusão")
-            st.pyplot(fig)
-
-            st.subheader("Relatório de Classificação")
-            st.text(classification_report(y, y_pred))
-        except Exception as e:
-            st.error(f"Erro ao avaliar o modelo: {e}")
-    else:
-        st.warning("⚠️ Não foi possível avaliar o desempenho do modelo. Verifique se o dataset contém 'nivel_obesidade' e se o pipeline está disponível.")
-
-else:
-    st.warning("⚠️ Carregue o dataset e o modelo para exibir o painel.")
-
-st.markdown("---")
-############ PAINEL ANALITICO ##############
-
-st.markdown("---") 
 
 # Descrição/Subtítulo (Ajustado com o contexto do desafio)
 st.markdown(
@@ -326,11 +192,304 @@ st.markdown(
     que prejudica a saúde, e este modelo integra dados antropométricos, genéticos e comportamentais 
     para um **pré-diagnóstico rápido**.
 
-    **Instruções:** Preencha os campos abaixo com as informações do paciente para obter o diagnóstico preditivo.
+    **Painel analítico:** A visão analítica que traz os principais insights da base disponibilizada.
     """
 )
 
 st.divider() # Linha final do cabeçalho
+
+############ PAINEL ANALITICO ##############
+
+
+# ==============================
+# 🔧 Configuração global de tema
+# ==============================
+def aplica_tema_streamlit(tema_escolhido: str = "Claro"):
+    """Aplica as cores do tema do Streamlit (claro/escuro) a matplotlib e seaborn."""
+    if tema_escolhido.lower() == "escuro":
+        cores = {
+            "backgroundColor": "#0E1117",
+            "secondaryBackgroundColor": "#262730",
+            "textColor": "#FAFAFA",
+            "primaryColor": "#1f77b4"
+        }
+    else:
+        cores = {
+            "backgroundColor": "#FFFFFF",
+            "secondaryBackgroundColor": "#F0F2F6",
+            "textColor": "#31333F",
+            "primaryColor": "#1f77b4"
+        }
+
+    cor_texto = cores["textColor"]
+
+    # Configura o Seaborn
+    sns.set_theme(style="whitegrid", palette="pastel")
+
+    # Configura o Matplotlib
+    plt.rcParams.update({
+        "axes.facecolor": "none",
+        "figure.facecolor": "none",
+        "text.color": cor_texto,
+        "axes.labelcolor": cor_texto,
+        "axes.edgecolor": cor_texto,
+        "xtick.color": cor_texto,
+        "ytick.color": cor_texto,
+        "axes.titlecolor": cor_texto,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Segoe UI"]
+    })
+
+    return cor_texto
+
+
+# ==============================
+# 🎨 Funções auxiliares p/ gráficos
+# ==============================
+def cria_figura():
+    """Cria figura padronizada sem bordas visíveis e fundo transparente."""
+    fig, ax = plt.subplots()
+    fig.patch.set_alpha(0.0)
+    ax.set_facecolor("none")
+    for spine in ["top", "right", "left", "right"]:
+        ax.spines[spine].set_visible(True)
+    return fig, ax
+
+
+def aplica_cor_texto(ax, cor):
+    """Aplica cor aos títulos, rótulos e ticks de um gráfico."""
+    ax.title.set_color(cor)
+    ax.xaxis.label.set_color(cor)
+    ax.yaxis.label.set_color(cor)
+    ax.tick_params(colors=cor)
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_color(cor)
+
+
+# ==============================
+# 🚀 Aplicação do tema global
+# ==============================
+
+st.header("🎨 Tema dos gráficos:")
+tema = st.radio("",["Claro", "Escuro"], horizontal=True)
+cor_texto = aplica_tema_streamlit(tema)
+st.markdown("---") 
+
+# ==============================
+# 📊 PAINEL ANALÍTICO
+# ==============================
+if df_painel is not None:
+    st.header("📊 Perfil da Amostra")
+
+    col_metricas1, col_metricas2, col_metricas3 = st.columns(3)
+
+    with col_metricas1:
+        st.subheader("📅 Idade")
+        st.metric("Média", f"{df_painel['idade'].mean():.1f} anos")
+        st.metric("Mínima", f"{df_painel['idade'].min()} anos")
+        st.metric("Máxima", f"{df_painel['idade'].max()} anos")
+
+    with col_metricas2:
+        st.subheader("⚖️ IMC")
+        st.metric("Média", f"{df_painel['imc'].mean():.1f}")
+        st.metric("Mínimo", f"{df_painel['imc'].min():.1f}")
+        st.metric("Máximo", f"{df_painel['imc'].max():.1f}")
+
+    with col_metricas3:
+        st.subheader("🧑‍🤝‍🧑 Gênero")
+        if 'genero' in df_painel.columns:
+            df_plot = df_painel.copy()
+            df_plot['genero_label'] = df_plot['genero'].map({0: 'Homem', 1: 'Mulher'}).fillna('Desconhecido')
+            genero_count = df_plot['genero_label'].value_counts()
+            total = genero_count.sum()
+            st.metric("Homens", f"{genero_count.get('Homem',0)} ({genero_count.get('Homem',0)/total*100:.1f}%)")
+            st.metric("Mulheres", f"{genero_count.get('Mulher',0)} ({genero_count.get('Mulher',0)/total*100:.1f}%)")
+
+    st.markdown("\n")
+
+    col1, col2 = st.columns(2)
+
+    # Gráfico de IMC
+    with col1:
+        fig1, ax1 = plt.subplots(figsize=(4, 4))
+        sns.histplot(df_painel['imc'].dropna(), bins=15, kde=True, ax=ax1)
+        ax1.set_title("Distribuição do IMC", color=cor_texto)
+        ax1.set_xlabel("IMC")
+        ax1.set_ylabel("Quantidade")
+        st.pyplot(fig1, use_container_width=True)
+
+    # Gráfico de Gênero
+    with col2:
+        if 'genero_label' in df_plot.columns:
+            fig2, ax2 = plt.subplots(figsize=(4, 4))
+            ax2.pie(genero_count, labels=genero_count.index, autopct='%1.1f%%', startangle=90,
+                    textprops={'color': cor_texto})
+            ax2.set_title("Distribuição por Gênero", color=cor_texto)
+            ax2.axis('equal')
+            st.pyplot(fig2, use_container_width=True)
+
+
+
+    st.markdown("---")
+
+    # Seção 2 - Hábitos Alimentares e Estilo de Vida
+    st.header("🥗 Hábitos Alimentares e Estilo de Vida")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if 'come_alimentos_caloricos_label' in df_painel.columns:
+            fig, ax = cria_figura()
+            sns.countplot(data=df_painel, x='come_alimentos_caloricos_label', order=['Não', 'Sim'], ax=ax)
+            ax.set_title("Consumo de Alimentos Calóricos", color=cor_texto)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+            aplica_cor_texto(ax, cor_texto)
+            st.pyplot(fig, transparent=True)
+
+    with col2:
+        if 'consome_alcool_label' in df_painel.columns:
+            fig, ax = cria_figura()
+            sns.countplot(
+                data=df_painel,
+                x='consome_alcool_label',
+                order=['Não', 'Algumas vezes', 'Frequentemente', 'Sempre'],
+                ax=ax
+            )
+            ax.set_title("Consumo de álcool", color=cor_texto)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+            aplica_cor_texto(ax, cor_texto)
+            st.pyplot(fig, transparent=True)
+    
+    st.markdown("\n")
+
+    col3, col4 = st.columns(2)
+    with col3:
+        if 'fuma_label' in df_painel.columns:
+            fig, ax = cria_figura()
+            sns.countplot(data=df_painel, x='fuma_label', order=['Não', 'Sim'], ax=ax)
+            ax.set_title("Fumantes na amostra", color=cor_texto)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+            aplica_cor_texto(ax, cor_texto)
+            st.pyplot(fig, transparent=True)
+
+    with col4:
+        if 'monitora_calorias_consumidas_label' in df_painel.columns:
+            fig, ax = cria_figura()
+            sns.countplot(data=df_painel, x='monitora_calorias_consumidas_label', order=['Não', 'Sim'], ax=ax)
+            ax.set_title("Monitora calorias?", color=cor_texto)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+            aplica_cor_texto(ax, cor_texto)
+            st.pyplot(fig, transparent=True)
+
+    st.markdown("---")
+
+    # Seção 3 - Desempenho do Modelo
+    st.header("🤖 Desempenho do Modelo")
+
+    if pipeline_modelo is not None and 'nivel_obesidade' in df_painel.columns:
+        try:
+            X = df_painel.drop(columns=['nivel_obesidade'])
+            y = df_painel['nivel_obesidade']
+            y_pred = pipeline_modelo.predict(X)
+
+            # Acurácia
+            acc = accuracy_score(y, y_pred)
+            st.metric("Acurácia do Modelo", f"{acc*100:.2f}%")
+
+            # Cria abas para duas seções
+            tab1, tab2 = st.tabs(["📊 Gráficos", "📋 Relatório de Classificação"])
+
+            # --- Seção 1: Gráficos ---
+            with tab1:
+                st.subheader("Desempenho Visual do Modelo")
+
+                col1, col2 = st.columns([1, 1])
+
+                # Matriz de Confusão
+                with col1:
+                    cm = confusion_matrix(y, y_pred)
+                    fig, ax = plt.subplots(figsize=(4, 3))
+                    sns.heatmap(
+                        cm,
+                        annot=True,
+                        fmt='d',
+                        cmap='Blues',
+                        cbar=False,
+                        linewidths=0.5,
+                        linecolor='gray',
+                        annot_kws={"size":8},
+                        ax=ax
+                    )
+                    ax.set_title("Matriz de Confusão", color=cor_texto, fontsize=12)
+                    ax.set_xlabel("Predito", color=cor_texto,fontsize=8)
+                    ax.set_ylabel("Real", color=cor_texto,fontsize=8)
+                    aplica_cor_texto(ax, cor_texto)
+                    st.pyplot(fig, transparent=True)
+
+                # Curva ROC
+                with col2:
+                    y_bin = label_binarize(y, classes=np.unique(y))
+                    n_classes = y_bin.shape[1]
+
+                    fpr = dict()
+                    tpr = dict()
+                    roc_auc = dict()
+
+                    for i in range(n_classes):
+                        fpr[i], tpr[i], _ = roc_curve(y_bin[:, i], y_pred == i)
+                        roc_auc[i] = auc(fpr[i], tpr[i])
+
+                    fig, ax = plt.subplots(figsize=(4, 3))
+                    for i in range(n_classes):
+                        ax.plot(fpr[i], tpr[i], label=f'Classe {i} (AUC = {roc_auc[i]:.2f})')
+                    ax.plot([0, 1], [0, 1], linestyle='--', color=cor_texto, alpha=0.5)
+                    ax.set_xlabel("Taxa de Falsos Positivos",fontsize=8)
+                    ax.set_ylabel("Taxa de Verdadeiros Positivos",fontsize=8)
+                    ax.set_title("Curva ROC")
+                    ax.legend(fontsize=8)
+                    aplica_cor_texto(ax, cor_texto)
+                    st.pyplot(fig, transparent=True)
+
+            # --- Seção 2: Relatório ---
+            with tab2:
+                st.subheader("Relatório de Classificação")
+                report = classification_report(y, y_pred, output_dict=True)
+                report_df = pd.DataFrame(report).transpose().round(2)
+                st.dataframe(report_df, height=400)  # Tabela scrollable
+
+
+                
+        except Exception as e:
+            st.error(f"Erro ao avaliar o modelo: {e}")
+    else:
+        st.warning(
+            "⚠️ Não foi possível avaliar o desempenho do modelo. "
+            "Verifique se o dataset contém 'nivel_obesidade' e se o pipeline está disponível."
+        )
+
+
+
+else:
+    st.warning("⚠️ Carregue o dataset e o modelo para exibir o painel.")
+
+############ FIM DO PAINEL ##############
+
+
+st.markdown("---")
+
+# Descrição/Subtítulo (Ajustado com o contexto do desafio)
+st.title(
+    """
+    **🔮 Aplicação preditiva**
+    Preencha os campos abaixo com as informações do paciente para obter o diagnóstico preditivo.
+    """
+)
+
+st.markdown("\n")
+st.markdown("\n")
 
 # Captura das Features
 
@@ -384,7 +543,6 @@ with col6:
         consome_alcool = st.radio("Consome Álcool", options=['Não', 'Às vezes', 'Frequentemente', 'Sempre'], horizontal=True, index=1)
     with col3_2:
         fuma = st.radio("Fuma", options=['Sim', 'Não'], horizontal=True, index=1)
-
 
 
 st.divider() # Linha separadora antes do botão
