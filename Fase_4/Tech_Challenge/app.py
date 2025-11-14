@@ -30,7 +30,7 @@ def carrega_pipeline():
 
 def carrega_dados():
     try:
-        df = pd.read_csv("/Fase_4/Tech_Challenge/Obesity_Final.csv")
+        df = pd.read_csv("Fase_4/Tech_Challenge/Obesity_Final.csv")
         return df
     except FileNotFoundError:
         st.error("❌ Arquivo de dados não encontrado.")
