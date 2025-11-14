@@ -16,4 +16,4 @@ st.write('### Estado civil')
 input_estado = st.selectbox('Qual é o seu estado civil?', dados['Estado_civil'].unique)
 
 st.write('### Qual é o tamanho da sua família?')
-input_idade = float(st.slider('Selecione a sua idade'), 1, 20)
+membros_familia = float(st.slider('Selecione a sua idade'), 1, 20)
