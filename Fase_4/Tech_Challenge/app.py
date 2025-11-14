@@ -15,7 +15,7 @@ sns.set_theme(style="whitegrid", palette="pastel")
 
 # Carregamento do pipeline usando decorador
 
-NOME_PIPELINE = 'Fase_4/Tech_Challenge/modelo_obesidade_pipeline_COMPLETO.joblib'
+NOME_PIPELINE = '/Fase_4/Tech_Challenge/modelo_obesidade_pipeline_COMPLETO.joblib'
 
 @st.cache_data
 def carrega_pipeline():
@@ -30,7 +30,7 @@ def carrega_pipeline():
 
 def carrega_dados():
     try:
-        df = pd.read_csv("Fase_4/Tech_Challenge/Obesity_Final.csv")
+        df = pd.read_csv("/Fase_4/Tech_Challenge/Obesity_Final.csv")
         return df
     except FileNotFoundError:
         st.error("❌ Arquivo de dados não encontrado.")
