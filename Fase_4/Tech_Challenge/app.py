@@ -128,9 +128,7 @@ def converte_costuma_comer_vegetais (df):
     return df
 
 
-# ==============================
 # 🎨 Função para aplicar o tema do Streamlit aos gráficos
-# ==============================
 def aplica_tema_streamlit():
     """Aplica as cores do tema atual do Streamlit a Seaborn e Matplotlib, com fallback seguro."""
     try:
@@ -139,7 +137,7 @@ def aplica_tema_streamlit():
         cores = None
 
     if not cores:
-        # Fallback padrão caso o tema não esteja disponível
+        # Defini cor padrão caso o tema não esteja disponível
         cores = {
             "primaryColor": "#1f77b4",
             "backgroundColor": "#FFFFFF",
@@ -171,7 +169,7 @@ def aplica_tema_streamlit():
 
 # Configuração da Página
 st.set_page_config(
-    page_title="Preditor de Obesidade", # Título que aparece na aba do navegador
+    page_title="Preditor de Obesidade",     # Título que aparece na aba do navegador
     page_icon="🏥",                      # Ícone na aba do navegador (pode ser um emoji ou caminho para um arquivo)
     layout="wide",                       # Define o layout para ocupar toda a largura da tela
     initial_sidebar_state="auto"         # Define o estado inicial da barra lateral
@@ -201,9 +199,9 @@ st.divider() # Linha final do cabeçalho
 ############ PAINEL ANALITICO ##############
 
 
-# ==============================
-# 🔧 Configuração global de tema
-# ==============================
+
+#  Configuração global de tema
+
 def aplica_tema_streamlit(tema_escolhido: str = "Claro"):
     """Aplica as cores do tema do Streamlit (claro/escuro) a matplotlib e seaborn."""
     if tema_escolhido.lower() == "escuro":
@@ -243,9 +241,9 @@ def aplica_tema_streamlit(tema_escolhido: str = "Claro"):
     return cor_texto
 
 
-# ==============================
-# 🎨 Funções auxiliares p/ gráficos
-# ==============================
+
+# Funções auxiliares p/ gráficos
+
 def cria_figura():
     """Cria figura padronizada sem bordas visíveis e fundo transparente."""
     fig, ax = plt.subplots()
@@ -266,18 +264,18 @@ def aplica_cor_texto(ax, cor):
         label.set_color(cor)
 
 
-# ==============================
-# 🚀 Aplicação do tema global
-# ==============================
+
+#  Aplicação do tema global
+
 
 st.header("🎨 Tema dos gráficos:")
 tema = st.radio("",["Claro", "Escuro"], horizontal=True)
 cor_texto = aplica_tema_streamlit(tema)
 st.markdown("---") 
 
-# ==============================
-# 📊 PAINEL ANALÍTICO
-# ==============================
+
+#  PAINEL ANALÍTICO
+
 if df_painel is not None:
     st.header("📊 Perfil da Amostra")
 
@@ -453,7 +451,7 @@ if df_painel is not None:
                     aplica_cor_texto(ax, cor_texto)
                     st.pyplot(fig, transparent=True)
 
-            # --- Seção 2: Relatório ---
+            # Seção 2: Relatório 
             with tab2:
                 st.subheader("Relatório de Classificação")
                 report = classification_report(y, y_pred, output_dict=True)
