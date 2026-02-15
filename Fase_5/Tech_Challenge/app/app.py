@@ -170,7 +170,7 @@ k = st.sidebar.slider("Top K alunos para priorizar", min_value=10, max_value=max
 limiar = st.sidebar.slider("Probabilidade (aba Ranking 2024)", min_value=0.0, max_value=1.0, value=0.70, step=0.05)
 
 corte_delta = st.sidebar.slider(
-    "Definir grau de severidade (risco = delta_INDE < corte)",
+    "Definir grau de severidade",
     min_value=-5.0, max_value=0.0, value=-1.0, step=0.1
 )
 
