@@ -120,8 +120,8 @@ def safe_float(x, default=0.0) -> float:
 # =========================
 # PATHS (fixos)
 # =========================
-path_valid = r"C:\Users\gabri\Desktop\FIAP\Fase_5\Tech_Challenge\data\base_validacao.parquet"
-path_2024  = r"C:\Users\gabri\Desktop\FIAP\Fase_5\Tech_Challenge\data\base_2024_pred.parquet"
+path_valid = "Fase_5/Tech_Challenge/data/base_validacao.parquet"
+path_2024  = "Fase_5/Tech_Challenge/data/base_2024_pred.parquet"
 
 # =========================
 # LOAD DATA
